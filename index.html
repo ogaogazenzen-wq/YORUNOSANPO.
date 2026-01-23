@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>38A094 - Zen Ogawa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div id="enter-page">
+        <div id="noise-grid"></div>
+        <div id="enter-trigger"></div>
+    </div>
+
+    <div id="loader-screen">
+        <canvas id="moonCanvas" width="300" height="300"></canvas>
+    </div>
+
+  <main id="main-content">
+        
+        <div class="ui-fixed ui-top-container">
+            <img src="ui_top.png" class="ui-top-image" alt="">
+            
+            <div class="ui-pos-00">
+                <span id="ui-number">00</span>
+            </div>
+            <div class="ui-pos-title">
+                <span id="ui-label">TITLE</span>
+            </div>
+        </div>
+        
+        <div class="center-group">
+            <img src="center_title.png" class="center-logo" alt="YORU NO SANPO">
+            
+            <canvas id="walkCanvas" width="200" height="200"></canvas>
+        </div>
+
+        <div class="ui-fixed ui-bottom-wrapper">
+            <img src="ui_bottom.png" class="ui-bottom-image" alt="">
+        </div>
+
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

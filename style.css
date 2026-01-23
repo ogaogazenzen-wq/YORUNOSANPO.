@@ -1,0 +1,195 @@
+/* =========================================
+   基本設定
+   ========================================= */
+:root {
+    --bg-color: #050505;
+    --text-base: rgba(255, 255, 255, 1);
+    --font-mono: 'Inter', sans-serif;
+}
+
+body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-base);
+    font-family: var(--font-mono);
+    overflow: hidden;
+}
+
+/* =========================================
+   1. ENTER PAGE (GRID)
+   ========================================= */
+#enter-page {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; 
+    z-index: 1000; background-color: var(--bg-color);
+    display: flex; justify-content: center; align-items: center;
+    transition: opacity 0.5s ease; cursor: pointer;
+}
+
+#noise-grid {
+    display: grid; 
+    width: auto; height: auto; margin: auto;
+    user-select: none; 
+    justify-content: center; align-content: center;
+    pointer-events: none;
+    font-family: var(--font-mono); 
+}
+
+.grid-item {
+    display: flex; justify-content: center; align-items: center;
+    color: rgba(255, 255, 255, 0.3); 
+    font-size: 12px;
+    transition: color 0.1s;
+}
+@media screen and (max-width: 768px) {
+    .grid-item { font-size: 10px; }
+}
+
+.is-enter {
+    color: #fff; text-shadow: 0 0 5px #fff;
+    font-weight: bold; z-index: 10;
+}
+
+/* =========================================
+   2. LOADER SCREEN (MOON)
+   ========================================= */
+#loader-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 900; background-color: var(--bg-color);
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+
+/* =========================================
+   3. MAIN CONTENT (土台)
+   ========================================= */
+#main-content {
+    position: relative;
+    width: 100%; height: 100vh; height: 100dvh;
+    background-color: #000;
+    
+    /* 完全な中央揃え */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+
+    opacity: 0; transition: opacity 1.5s ease;
+    overflow: hidden; 
+}
+
+/* =========================================
+   左上UI (ui-top) 設定
+   ========================================= */
+.ui-top-container {
+    position: absolute;
+    top: 20px; 
+    left: 0; 
+    right: 0; 
+    width: 100%; 
+    height: auto; 
+    z-index: 10;
+    pointer-events: none;
+}
+
+.ui-top-image {
+    width: 100%; 
+    display: block;
+    height: auto;
+    object-fit: cover; 
+    object-position: left top; 
+}
+
+/* --- 文字の位置合わせ (最終調整) --- */
+
+/* 00の位置：下の小さい四角の右横に「余裕を持って」配置 */
+.ui-pos-00 {
+    position: absolute;
+    /* 正方形に乗らないよう、右へ移動 (8% -> 11%) */
+    left: 5%; 
+    /* 高さは維持 */
+    top: 69%;  
+    
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: clamp(10px, 2.5vw, 14px);
+    line-height: 1;
+}
+
+/* TITLEの位置：上の大きい四角の右横に「余裕を持って中心を合わせて」配置 */
+.ui-pos-title {
+    position: absolute;
+    /* 正方形と線の間にスペースを作るため右へ (17% -> 19%) */
+    left: 10%; 
+    /* 中心線が揃うように少し下げる (32% -> 34%) */
+    top: 22%;  
+    
+    font-family: var(--font-mono);
+    font-weight: 800;
+    /* 文字サイズを少し控えめに修正 */
+    font-size: clamp(12px, 4vw, 22px); 
+    line-height: 1;
+    letter-spacing: 0.05em;
+}
+
+/* スマホ微調整 */
+@media screen and (max-width: 400px) {
+    .ui-pos-00 { left: 11%; top: 69%; }
+    .ui-pos-title { left: 20%; top: 27%; }
+}
+
+
+/* =========================================
+   センターグループ (タイトル画像 + 人)
+   ========================================= */
+.center-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0px; 
+    margin: 0;
+    /* 変なズレをなくして完全に真ん中へ */
+    transform: none; 
+}
+
+.center-logo {
+    /* ★修正: 小さすぎず大きすぎない中間サイズ (55vw) */
+    width: 55vw; 
+    max-width: 290px; 
+    height: auto;
+    display: block; 
+}
+
+#walkCanvas {
+    margin-top: -10px; 
+    width: 100px; 
+    height: 100px;
+}
+
+
+/* =========================================
+   下UI (ui-bottom) 設定
+   ========================================= */
+.ui-bottom-wrapper {
+    position: absolute;
+    bottom: 20px; 
+    left: 0; 
+    width: 0%; 
+    height: auto;
+    overflow: hidden; 
+    transition: width 3.0s cubic-bezier(0.2, 1, 0.3, 1); 
+    z-index: 10;
+}
+
+.ui-bottom-wrapper.is-active {
+    width: 100%; 
+}
+
+.ui-bottom-image {
+    width: 100vw; 
+    height: auto;
+    display: block;
+    object-fit: cover;
+    object-position: left;
+}
