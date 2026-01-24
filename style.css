@@ -1,195 +1,60 @@
 /* =========================================
-   基本設定
+   基本設定 & ENTER (然さんの完璧設定を復元)
    ========================================= */
-:root {
-    --bg-color: #050505;
-    --text-base: rgba(255, 255, 255, 1);
-    --font-mono: 'Inter', sans-serif;
-}
+:root { --bg-color: #050505; --text-base: rgba(255, 255, 255, 1); --font-mono: 'Inter', sans-serif; }
+body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: var(--bg-color); color: var(--text-base); font-family: var(--font-mono); overflow: hidden; touch-action: none; }
 
-body {
-    margin: 0; padding: 0;
-    width: 100%; height: 100%;
-    background-color: var(--bg-color);
-    color: var(--text-base);
-    font-family: var(--font-mono);
-    overflow: hidden;
-}
+#enter-page { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; z-index: 1000; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease; cursor: pointer; }
+#noise-grid { display: grid; width: auto; height: auto; margin: auto; user-select: none; justify-content: center; align-content: center; pointer-events: none; }
+.grid-item { display: flex; justify-content: center; align-items: center; color: rgba(255, 255, 255, 0.3); font-size: 12px; transition: color 0.1s; }
+@media screen and (max-width: 768px) { .grid-item { font-size: 10px; } }
+.is-enter { color: #fff; text-shadow: 0 0 5px #fff; font-weight: bold; z-index: 10; }
 
-/* =========================================
-   1. ENTER PAGE (GRID)
-   ========================================= */
-#enter-page {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; 
-    z-index: 1000; background-color: var(--bg-color);
-    display: flex; justify-content: center; align-items: center;
-    transition: opacity 0.5s ease; cursor: pointer;
-}
+/* --- 共通レイアウト --- */
+#loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 900; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+#main-content { position: relative; width: 100%; height: 100vh; height: 100dvh; background-color: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 1.5s ease; overflow: hidden; }
 
-#noise-grid {
-    display: grid; 
-    width: auto; height: auto; margin: auto;
-    user-select: none; 
-    justify-content: center; align-content: center;
-    pointer-events: none;
-    font-family: var(--font-mono); 
-}
+.ui-top-container { position: absolute; top: 20px; left: 0; right: 0; width: 100%; height: auto; z-index: 10; pointer-events: none; }
+.ui-top-image { width: 100%; display: block; height: auto; object-fit: cover; object-position: left top; }
+.ui-pos-00 { position: absolute; left: 11.5%; top: 69.9%; font-family: var(--font-mono); font-weight: 800; font-size: 2.8vw; line-height: 1; }
+.ui-pos-title { position: absolute; left: 20%; top: 26.3%; font-family: var(--font-mono); font-weight: 800; font-size: 4.1vw; line-height: 1; letter-spacing: 0.05em; }
+#ui-label { background-color: var(--bg-color); padding-left: 2px; padding-right: 5px; position: relative; z-index: 2; }
 
-.grid-item {
-    display: flex; justify-content: center; align-items: center;
-    color: rgba(255, 255, 255, 0.3); 
-    font-size: 12px;
-    transition: color 0.1s;
-}
-@media screen and (max-width: 768px) {
-    .grid-item { font-size: 10px; }
-}
+.center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; }
+.center-logo { width: 55vw; max-width: 290px; height: auto; }
+#walkCanvas { margin-top: -10px; width: 100px; height: 100px; }
+.tap-guide { margin-top: 20px; color: #666; font-size: 10px; letter-spacing: 0.2em; animation: blinkSoft 3s infinite; }
 
-.is-enter {
-    color: #fff; text-shadow: 0 0 5px #fff;
-    font-weight: bold; z-index: 10;
-}
+.scroll-container { width: 100%; padding: 0 20px; box-sizing: border-box; max-height: 58vh; overflow-y: auto; overflow-x: hidden; touch-action: pan-y; position: relative; z-index: 60; scrollbar-width: none; }
+.p-text { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 13.5px; line-height: 2.1; letter-spacing: 0.12em; text-align: center; margin-bottom: 2.5vh; color: #444; transition: color 0.3s; word-break: keep-all; }
+.char-lit { color: #ffffff; text-shadow: 0 0 2px rgba(255, 255, 255, 0.5); }
 
-/* =========================================
-   2. LOADER SCREEN (MOON)
-   ========================================= */
-#loader-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 900; background-color: var(--bg-color);
-    display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-}
+/* マーカー */
+span[class^="mark-"] { padding: 2px 2px; margin: 0 -2px; border-radius: 2px; transition: background-color 0.5s; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.mark-blue { background-color: rgba(0, 140, 255, 0.6); }
+.mark-orange { background-color: rgba(235, 60, 10, 0.9); }
+.mark-yellowgreen { background-color: rgba(190, 255, 0, 0.85); }
+.mark-yellowgreen .char-lit { color: #000 !important; text-shadow: none; }
+.mark-poison { background-color: rgba(0, 80, 20, 0.95); box-shadow: 0 0 8px rgba(0, 100, 30, 0.8); }
+.mark-poison .char-lit { color: #ffffff !important; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); }
+.mark-white { background-color: rgba(255, 255, 255, 0.85); }
+.mark-white .char-lit { color: #000 !important; text-shadow: none; }
 
-/* =========================================
-   3. MAIN CONTENT (土台)
-   ========================================= */
-#main-content {
-    position: relative;
-    width: 100%; height: 100vh; height: 100dvh;
-    background-color: #000;
-    
-    /* 完全な中央揃え */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center;
-
-    opacity: 0; transition: opacity 1.5s ease;
-    overflow: hidden; 
-}
-
-/* =========================================
-   左上UI (ui-top) 設定
-   ========================================= */
-.ui-top-container {
-    position: absolute;
-    top: 20px; 
-    left: 0; 
-    right: 0; 
-    width: 100%; 
-    height: auto; 
-    z-index: 10;
-    pointer-events: none;
-}
-
-.ui-top-image {
-    width: 100%; 
-    display: block;
-    height: auto;
-    object-fit: cover; 
-    object-position: left top; 
-}
-
-/* --- 文字の位置合わせ (最終調整) --- */
-
-/* 00の位置：下の小さい四角の右横に「余裕を持って」配置 */
-.ui-pos-00 {
-    position: absolute;
-    /* 正方形に乗らないよう、右へ移動 (8% -> 11%) */
-    left: 5%; 
-    /* 高さは維持 */
-    top: 69%;  
-    
-    font-family: var(--font-mono);
-    font-weight: 800;
-    font-size: clamp(10px, 2.5vw, 14px);
-    line-height: 1;
-}
-
-/* TITLEの位置：上の大きい四角の右横に「余裕を持って中心を合わせて」配置 */
-.ui-pos-title {
-    position: absolute;
-    /* 正方形と線の間にスペースを作るため右へ (17% -> 19%) */
-    left: 10%; 
-    /* 中心線が揃うように少し下げる (32% -> 34%) */
-    top: 22%;  
-    
-    font-family: var(--font-mono);
-    font-weight: 800;
-    /* 文字サイズを少し控えめに修正 */
-    font-size: clamp(12px, 4vw, 22px); 
-    line-height: 1;
-    letter-spacing: 0.05em;
-}
-
-/* スマホ微調整 */
-@media screen and (max-width: 400px) {
-    .ui-pos-00 { left: 11%; top: 69%; }
-    .ui-pos-title { left: 20%; top: 27%; }
-}
+/* ABOUT & SORROW 背景設定 */
+.about-bg-container { position: absolute; top: 0; right: 0; width: 67%; height: 100%; z-index: 0; transform: translateX(100%); transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.about-bg-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+.is-active .about-bg-container { transform: translateX(0); }
+.about-scroll { margin-left: 0; margin-right: auto; width: 65%; margin-top: 15vh; }
+.about-inner { align-items: flex-start; }
+#group-about .p-text, #group-sorrow .p-text { text-align: left; color: #777; }
 
 
-/* =========================================
-   センターグループ (タイトル画像 + 人)
-   ========================================= */
-.center-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0px; 
-    margin: 0;
-    /* 変なズレをなくして完全に真ん中へ */
-    transform: none; 
-}
+/* --- UI BOTTOM 復元 --- */
+.ui-bottom-wrapper { position: absolute; bottom: 20px; left: 0; width: 0%; height: auto; transition: width 3.0s cubic-bezier(0.2, 1, 0.3, 1); z-index: 10; overflow: hidden; }
+.ui-bottom-wrapper.is-active { width: 100%; }
+.ui-bottom-image { width: 100vw; height: auto; display: block; object-fit: cover; object-position: left; }
 
-.center-logo {
-    /* ★修正: 小さすぎず大きすぎない中間サイズ (55vw) */
-    width: 55vw; 
-    max-width: 290px; 
-    height: auto;
-    display: block; 
-}
-
-#walkCanvas {
-    margin-top: -10px; 
-    width: 100px; 
-    height: 100px;
-}
-
-
-/* =========================================
-   下UI (ui-bottom) 設定
-   ========================================= */
-.ui-bottom-wrapper {
-    position: absolute;
-    bottom: 20px; 
-    left: 0; 
-    width: 0%; 
-    height: auto;
-    overflow: hidden; 
-    transition: width 3.0s cubic-bezier(0.2, 1, 0.3, 1); 
-    z-index: 10;
-}
-
-.ui-bottom-wrapper.is-active {
-    width: 100%; 
-}
-
-.ui-bottom-image {
-    width: 100vw; 
-    height: auto;
-    display: block;
-    object-fit: cover;
-    object-position: left;
-}
+.nav-zone { position: fixed; top: 0; height: 100%; width: 50%; z-index: 50; cursor: pointer; }
+#nav-left { left: 0; } #nav-right { right: 0; }
+.spacer-s { height: 3vh; width: 100%; } .spacer-m { height: 6vh; width: 100%; } .spacer-l { height: 10vh; width: 100%; }
+@media screen and (max-width: 500px) { .about-scroll { width: 90%; } .about-bg-container { width: 80%; } .sekiryo-logo-img { width: 150px; } }

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>38A094 - Zen Ogawa</title>
+    <title>YORU NO SANPO</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;800&display=swap" rel="stylesheet">
 </head>
 <body>
     
@@ -20,29 +20,91 @@
         <canvas id="moonCanvas" width="300" height="300"></canvas>
     </div>
 
-  <main id="main-content">
+    <main id="main-content">
         
         <div class="ui-fixed ui-top-container">
             <img src="ui_top.png" class="ui-top-image" alt="">
-            
-            <div class="ui-pos-00">
-                <span id="ui-number">00</span>
-            </div>
-            <div class="ui-pos-title">
-                <span id="ui-label">TITLE</span>
-            </div>
+            <div class="ui-pos-00"><span id="ui-number">00</span></div>
+            <div class="ui-pos-title"><span id="ui-label">TITLE</span></div>
         </div>
         
-        <div class="center-group">
+        <div class="center-group" id="group-title">
             <img src="center_title.png" class="center-logo" alt="YORU NO SANPO">
-            
             <canvas id="walkCanvas" width="200" height="200"></canvas>
+            <p class="tap-guide">TAP TO NEXT</p>
+        </div>
+
+        <div class="center-group" id="group-prologue" style="display: none; opacity: 0;">
+            <div class="scroll-container">
+                <div class="prologue-inner" id="prologue-text-root">
+                    <p class="p-text">夜。</p>
+                    <div class="spacer-s"></div>
+                    <p class="p-text">人通りの多い交差点、<br>点滅する信号機、<br>神社、寂れた古いマンション、</p>
+                    <p class="p-text">小さな公園、少し傾いた電柱、<br>駅、ラクガキだらけのトンネル。</p>
+                    <div class="spacer-s"></div>
+                    <p class="p-text">何もかもが、<br>陽の照る時間とは違った姿を呈する。</p>
+                    <div class="spacer-m"></div>
+                    <p class="p-text">ある日の眠れない23時過ぎ、<br>私はなにを思ったか、まるで光に集り貪る蛾のように、<br>気の済むまで夜の街をゆらゆらと彷徨った。</p>
+                    <p class="p-text">日々胸に溜めこんだ、グズグズと煮えるざわめきを供養するように、<br>ひたすらシャッターを切った。</p>
+                    <div class="spacer-m"></div>
+                    <p class="p-text">闇夜に輝く光達には得も言われぬ美しさ、<br>ある種の神秘性が宿る。</p>
+                    <p class="p-text">そしてその光を捉えることで、<br>私は私を癒すことができる。<br>そう信じている。</p>
+                    <div class="spacer-m"></div>
+                    <p class="p-text">この場所は、その日から今日までの、<br>私が消費してきた光の備忘録だ。</p>
+                    <div class="spacer-l"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-about" style="display: none; opacity: 0;">
+            <div class="about-bg-container"><img src="about_bg.png" alt="" class="about-bg-image"></div>
+            <div class="scroll-container about-scroll">
+                <div class="prologue-inner about-inner" id="about-text-root">
+                    <p class="p-text">溢れんばかりの人間と、<br>彼らが生み出すカオスな雰囲気が渦巻く夜の都会には、<br>「光」が溢れている。</p>
+                    <p class="p-text">渋谷のスクランブル交差点や<br>新宿の歌舞伎町周辺のエネルギッシュな空気を<br>象徴するような、目が眩むほどの輝かしい光もあれば、</p>
+                    <p class="p-text">その裏通りに隠れる、切れかけで明滅する蛍光灯や<br>淡く優しく道を照らす街路灯など<br>色々な種類が存在することに気づく。</p>
+                    <div class="spacer-m"></div>
+                    <p class="p-text">本サイトの目的は<br>「<span class="mark-white">光が織りなす夜の街の美しさの<br>再探索・再発見および、それらを<br>“感情”とリンクさせ分類する</span>」ことにある。</p>
+                    <p class="p-text">人には多くの感情が複雑に抱え込まれており、<br>それらが呼び起こされるファクターとして<br>周囲の環境が大きく作用している。</p>
+                    <p class="p-text">それに深く関わっているものの一つが「照明」だ。</p>
+                    <div class="spacer-l"></div>
+                    <p class="p-text">私は光が煽る主な感情を、四つに分類した。</p>
+                    <p class="p-text">それが<br>「<span class="mark-blue">寂寥</span>」、「<span class="mark-orange">温包</span>」、<br>「<span class="mark-yellowgreen">輝興</span>」、「<span class="mark-poison">慄然</span>」だ。</p>
+                    <div class="spacer-l"></div>
+                    <p class="p-text">さあ、散歩へでかけましょう。</p>
+                    <div class="spacer-l"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-sorrow" style="display: none; opacity: 0;">
+            <div class="about-bg-container"><img src="sekiryo_bg.png" alt="" class="about-bg-image"></div>
+            <div class="scroll-container sorrow-scroll">
+                <div class="prologue-inner about-inner" id="sorrow-text-root">
+                    
+                    <div class="logo-animation-container">
+                        <img src="sekiryo_logo.png" alt="寂寥" class="sekiryo-logo-img">
+                        <div class="tear t1"></div>
+                        <div class="tear t2"></div>
+                        <div class="tear t3"></div>
+                    </div>
+
+                    <div class="spacer-m"></div>
+                    <p class="p-text">ぽつりと光る、冷たい明り。</p>
+                    <p class="p-text">感傷にふける宵は<br>仄かに青く深まる。</p>
+                    <p class="p-text">瞼は重く、意識は嫌に冴える。</p>
+                    <div class="spacer-m"></div>
+                    <p class="p-text">残り少ない水を一気に呷った。</p>
+                    <div class="spacer-l"></div>
+                </div>
+            </div>
         </div>
 
         <div class="ui-fixed ui-bottom-wrapper">
             <img src="ui_bottom.png" class="ui-bottom-image" alt="">
         </div>
-
+        <div id="nav-left" class="nav-zone"></div>
+        <div id="nav-right" class="nav-zone"></div>
     </main>
     <script src="script.js"></script>
 </body>

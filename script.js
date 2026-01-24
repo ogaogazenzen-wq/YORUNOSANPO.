@@ -1,349 +1,213 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // =========================================================
-    // 設定・変数定義
-    // =========================================================
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/.-_"; 
-    
-    // --- HTML要素の取得 ---
     const enterPage = document.getElementById('enter-page');
     const grid = document.getElementById('noise-grid');
-    
     const loaderScreen = document.getElementById('loader-screen');
     const moonCanvas = document.getElementById('moonCanvas');
-    
     const mainContent = document.getElementById('main-content');
     const walkCanvas = document.getElementById('walkCanvas');
     const uiBottomWrapper = document.querySelector('.ui-bottom-wrapper'); 
-    
-    // --- 状態管理変数 ---
-    let gridAnimationId;
-    // isEnterReady はもう使いませんが、一応残しておいてもエラーにはなりません
 
-    // =========================================================
-    // PART 1: グリッドアニメーション (ENTER画面)
-    // =========================================================
+    let gridAnimationId;
+
+    // --- 1. ENTER演出 (然さんの完璧ロジック復元) ---
     function initGrid() {
         grid.innerHTML = '';
         if(gridAnimationId) cancelAnimationFrame(gridAnimationId);
-        
         const isMobile = window.innerWidth < 768;
         const cellSize = isMobile ? 14 : 20; 
         const marginX = isMobile ? 30 : 60;
         const marginY = isMobile ? 80 : 60;
-
         let cols = Math.floor((window.innerWidth - marginX) / cellSize);
         let rows = Math.floor((window.innerHeight - marginY) / cellSize);
-
         if (cols % 2 === 0) cols--;
         if (rows % 2 === 0) rows--;
-
         grid.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
         grid.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
-
-        const total = cols * rows;
         const items = [];
         const fragment = document.createDocumentFragment();
-
-        for (let i = 0; i < total; i++) {
+        for (let i = 0; i < cols * rows; i++) {
             const div = document.createElement('div');
-            div.classList.add('grid-item');
-            div.textContent = "_";
+            div.classList.add('grid-item'); div.textContent = "_";
             fragment.appendChild(div);
             items.push({ el: div, locked: false, target: "_", isEnter: false, isActiveNoise: false });
         }
         grid.appendChild(fragment);
-
         const midRow = Math.floor(rows / 2);
         const midCol = Math.floor(cols / 2);
         const enterChars = ["{", "E", "N", "T", "E", "R", "}"];
         const startIdx = (midRow * cols) + (midCol - 3); 
-
         enterChars.forEach((char, i) => {
             if (items[startIdx + i]) {
-                items[startIdx + i].target = char;
-                items[startIdx + i].isEnter = true;
+                items[startIdx + i].target = char; items[startIdx + i].isEnter = true;
             }
         });
-
         startGridAnimation(items);
     }
 
     function startGridAnimation(items) {
         let frame = 0;
-        const updateInterval = 8; 
-        const chaosFrames = 90; 
-        const resolveFrames = 180; 
-        const maxFrames = chaosFrames + resolveFrames;
-
+        const chaosFrames = 90; const resolveFrames = 180;
         function animate() {
-            const shouldUpdate = frame % updateInterval === 0;
-
             if (frame < chaosFrames) {
                 const chaosProgress = frame / chaosFrames;
-                const density = Math.pow(chaosProgress, 2); 
-
                 items.forEach(item => {
-                    if (!item.isActiveNoise && Math.random() < density * 0.2) { 
-                             item.isActiveNoise = true;
-                             item.el.classList.remove('is-underscore');
-                    }
-                    if (item.isActiveNoise && shouldUpdate) {
+                    if (!item.isActiveNoise && Math.random() < chaosProgress * 0.2) item.isActiveNoise = true;
+                    if (item.isActiveNoise && frame % 8 === 0) item.el.textContent = chars[Math.floor(Math.random() * chars.length)];
+                });
+            } else {
+                const resolveProgress = (frame - chaosFrames) / resolveFrames;
+                const threshold = Math.pow(resolveProgress, 3);
+                items.forEach(item => {
+                    if (item.locked) return;
+                    if (Math.random() < threshold) {
+                        item.locked = true; item.el.textContent = item.target;
+                        if (item.isEnter) item.el.classList.add('is-enter');
+                    } else if (frame % 8 === 0) {
                         item.el.textContent = chars[Math.floor(Math.random() * chars.length)];
                     }
                 });
             }
-            else {
-                const resolveProgress = (frame - chaosFrames) / resolveFrames;
-                const threshold = Math.pow(resolveProgress, 3); 
-                let allLocked = true;
-
-                items.forEach(item => {
-                    if (item.locked) return;
-                    if (Math.random() < threshold) {
-                        item.locked = true;
-                        item.el.textContent = item.target;
-                        if (item.isEnter) item.el.classList.add('is-enter');
-                        else item.el.classList.add('is-underscore');
-                    } else {
-                        if (shouldUpdate) item.el.textContent = chars[Math.floor(Math.random() * chars.length)];
-                        allLocked = false;
-                    }
-                });
-                if (allLocked && frame >= maxFrames) {
-                         finalizeGrid(items);
-                         return;
-                }
-            }
-            frame++;
-            if (frame <= maxFrames) {
-                gridAnimationId = requestAnimationFrame(animate);
-            } else {
-                finalizeGrid(items);
-            }
+            frame++; gridAnimationId = requestAnimationFrame(animate);
         }
         gridAnimationId = requestAnimationFrame(animate);
     }
-
-    function finalizeGrid(items) {
-        items.forEach(item => {
-            if (!item.locked) {
-                item.el.textContent = item.target;
-                if (item.isEnter) item.el.classList.add('is-enter');
-                else item.el.classList.add('is-underscore');
-            }
-        });
-        // もう isReady フラグを待つ必要はありません
-    }
-
     initGrid();
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(initGrid, 200);
-    });
 
-
-    // =========================================================
-    // PART 2: 遷移処理と月の満ち欠け (Loader Screen)
-    // =========================================================
-    
+    // --- 2. 月のローディング (ellipse立体版) ---
     const ctx = moonCanvas.getContext('2d');
-    const centerX = moonCanvas.width / 2;
-    const centerY = moonCanvas.height / 2;
-    const radius = 30; 
-    
-    let moonStartTime;
-    let moonAnimId;
-    
-    const totalMoonDuration = 1000; 
-    const cycleDuration = 500; 
-
     function drawMoon(phase) {
-        ctx.clearRect(0, 0, moonCanvas.width, moonCanvas.height);
-        
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.stroke();
-        
+        const cx = 150, cy = 150, radius = 30;
+        ctx.clearRect(0, 0, 300, 300);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.beginPath();
         if (phase <= 0.5) {
             const fillAmount = phase * 2;
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            if (fillAmount <= 0.5) {
-                const curveOffset = radius * (1 - fillAmount * 2);
-                ctx.arc(centerX, centerY, radius, -Math.PI / 2, Math.PI / 2, false);
-                ctx.ellipse(centerX, centerY, curveOffset, radius, 0, Math.PI / 2, -Math.PI / 2, true);
-            } else {
-                const curveOffset = radius * ((fillAmount - 0.5) * 2);
-                ctx.arc(centerX, centerY, radius, -Math.PI / 2, Math.PI / 2, false);
-                ctx.ellipse(centerX, centerY, curveOffset, radius, 0, Math.PI / 2, -Math.PI / 2, false);
-            }
-            ctx.closePath();
-            ctx.fill();
+            const curveOffset = radius * (fillAmount <= 0.5 ? (1 - fillAmount * 2) : ((fillAmount - 0.5) * 2));
+            ctx.arc(cx, cy, radius, -Math.PI / 2, Math.PI / 2, false);
+            ctx.ellipse(cx, cy, curveOffset, radius, 0, Math.PI / 2, -Math.PI / 2, fillAmount <= 0.5);
         } else {
             const fillAmount = (1 - phase) * 2;
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            if (fillAmount >= 0.5) {
-                const curveOffset = radius * ((fillAmount - 0.5) * 2);
-                ctx.arc(centerX, centerY, radius, Math.PI / 2, -Math.PI / 2, false);
-                ctx.ellipse(centerX, centerY, curveOffset, radius, 0, -Math.PI / 2, Math.PI / 2, false);
-            } else {
-                const curveOffset = radius * (1 - fillAmount * 2);
-                ctx.arc(centerX, centerY, radius, Math.PI / 2, -Math.PI / 2, false);
-                ctx.ellipse(centerX, centerY, curveOffset, radius, 0, -Math.PI / 2, Math.PI / 2, true);
-            }
-            ctx.closePath();
-            ctx.fill();
+            const curveOffset = radius * (fillAmount >= 0.5 ? ((fillAmount - 0.5) * 2) : (1 - fillAmount * 2));
+            ctx.arc(cx, cy, radius, Math.PI / 2, -Math.PI / 2, false);
+            ctx.ellipse(cx, cy, curveOffset, radius, 0, -Math.PI / 2, Math.PI / 2, fillAmount < 0.5);
         }
+        ctx.closePath(); ctx.fill();
     }
 
-    function animateMoon() {
-        const currentTime = Date.now();
-        const elapsed = currentTime - moonStartTime;
-
-        if (elapsed > totalMoonDuration) {
-            finishLoading();
-            return;
-        }
-
-        const phase = (elapsed % cycleDuration) / cycleDuration;
-        drawMoon(phase);
-        moonAnimId = requestAnimationFrame(animateMoon);
-    }
-
-    function finishLoading() {
-        cancelAnimationFrame(moonAnimId);
-        loaderScreen.style.opacity = '0';
-        
-        setTimeout(() => {
-            loaderScreen.style.display = 'none';
-            document.body.style.overflow = 'auto'; 
-            
-            mainContent.style.opacity = '1';
-            startWalking(); 
-            
-            if(uiBottomWrapper) {
-                setTimeout(() => {
-                    uiBottomWrapper.classList.add('is-active');
-                }, 100);
-            }
-
-        }, 500); 
-    }
-
-    // --- Enter画面クリック時のイベント (修正版) ---
     enterPage.addEventListener('click', () => {
-        // ★ロック解除！いつでもクリック可能
-        
-        // もしグリッドアニメーションが動いていたら強制停止（負荷軽減）
-        if(gridAnimationId) cancelAnimationFrame(gridAnimationId);
-        
         enterPage.style.opacity = '0';
         setTimeout(() => {
-            enterPage.style.display = 'none';
-            loaderScreen.style.opacity = '1';
-            
-            moonStartTime = Date.now();
-            animateMoon();
-        }, 500); 
+            enterPage.style.display = 'none'; loaderScreen.style.opacity = '1';
+            let start = Date.now();
+            const anim = () => {
+                let elapsed = Date.now() - start;
+                if (elapsed > 1000) {
+                    loaderScreen.style.display = 'none'; mainContent.style.opacity = '1';
+                    if(uiBottomWrapper) uiBottomWrapper.classList.add('is-active');
+                    return;
+                }
+                drawMoon((elapsed % 500) / 500); requestAnimationFrame(anim);
+            };
+            anim();
+        }, 500);
     });
 
-
-    // =========================================================
-    // PART 3: 歩くピクトグラム (Walking Man)
-    // =========================================================
+    // --- 3. ピクトグラム (腕・脚 描画版) ---
     const wCtx = walkCanvas.getContext('2d');
-    
-    const manScale = 0.6; 
-    const walkSpeed = 0.1; 
-    
     let walkTime = 0;
-    let walkAnimId;
-    let isWalking = false;
-
-    wCtx.strokeStyle = '#ffffff';
-    wCtx.lineCap = 'round'; 
-    wCtx.lineJoin = 'round'; 
-    wCtx.lineWidth = 4; 
-
     function drawWalker() {
         wCtx.clearRect(0, 0, walkCanvas.width, walkCanvas.height);
-        
-        const cx = walkCanvas.width / 2;
-        const cy = walkCanvas.height / 2;
-        
-        walkTime += walkSpeed;
-        
-        const bounce = Math.sin(walkTime * 2) * 2 * manScale;
-        const hipX = cx;
-        const hipY = cy + 10 * manScale + bounce;
-        
-        const headX = hipX + 5 * manScale; 
-        const headY = hipY - 50 * manScale;
-        
-        const leftLegAngle = Math.sin(walkTime) * 0.6; 
-        const rightLegAngle = Math.sin(walkTime + Math.PI) * 0.6;
-        const leftArmAngle = Math.sin(walkTime + Math.PI) * 0.5;
-        const rightArmAngle = Math.sin(walkTime) * 0.5;
-
-        wCtx.beginPath();
-        
-        const headRadius = 12 * manScale;
-        wCtx.moveTo(headX + headRadius, headY);
-        wCtx.arc(headX, headY, headRadius, 0, Math.PI * 2);
-        
-        const neckY = headY + headRadius;
-        wCtx.moveTo(headX, neckY);
-        wCtx.lineTo(hipX, hipY);
-        
-        function drawLimb(startX, startY, angle, length, isLeg) {
-            const j1Len = length * 0.5;
-            const j1X = startX + Math.sin(angle) * j1Len;
-            const j1Y = startY + Math.cos(angle) * j1Len;
-            let angle2 = angle + (isLeg ? 0.2 * Math.sin(walkTime) : -0.3); 
-            const endX = j1X + Math.sin(angle) * j1Len;
-            const endY = j1Y + Math.cos(angle) * j1Len;
+        const cx = 100, cy = 100; walkTime += 0.1;
+        const bounce = Math.sin(walkTime * 2) * 1.2;
+        wCtx.strokeStyle = '#fff'; wCtx.lineWidth = 4; wCtx.lineCap = 'round';
+        wCtx.beginPath(); wCtx.arc(cx + 3, cy - 30 + bounce, 7, 0, Math.PI * 2);
+        wCtx.moveTo(cx + 3, cy - 23 + bounce); wCtx.lineTo(cx, cy + 6 + bounce);
+        const aR = Math.sin(walkTime) * 0.6, aL = Math.sin(walkTime + Math.PI) * 0.6;
+        const drawLimb = (startX, startY, angle, len) => {
             wCtx.moveTo(startX, startY);
-            wCtx.lineTo(endX, endY);
-        }
-
-        const legLen = 50 * manScale;
-        drawLimb(hipX, hipY, rightLegAngle, legLen, true);
-        drawLimb(hipX, hipY, leftLegAngle, legLen, true);
-        
-        const shoulderY = neckY + 10 * manScale;
-        const armLen = 45 * manScale;
-        drawLimb(headX, shoulderY, rightArmAngle, armLen, false);
-        drawLimb(headX, shoulderY, leftArmAngle, armLen, false);
-
-        wCtx.stroke();
-        
-        if (isWalking) {
-            walkAnimId = requestAnimationFrame(drawWalker);
-        }
+            wCtx.lineTo(startX + Math.sin(angle) * len, startY + Math.cos(angle) * len);
+        };
+        drawLimb(cx, cy + 6 + bounce, aR, 30); drawLimb(cx, cy + 6 + bounce, aL, 30);
+        drawLimb(cx + 3, cy - 17 + bounce, aL, 25); drawLimb(cx + 3, cy - 17 + bounce, aR, 25);
+        wCtx.stroke(); requestAnimationFrame(drawWalker);
     }
+    drawWalker();
 
-    function startWalking() {
-        if (isWalking) return;
-        isWalking = true;
-        drawWalker();
-    }
+    // --- 4. ページ管理 & 文章アニメーション ---
+    let currentPage = 0; const totalPages = 4;
+    const groups = [ 
+        document.getElementById('group-title'), document.getElementById('group-prologue'), 
+        document.getElementById('group-about'), document.getElementById('group-sorrow')
+    ];
+    const pageData = [ ["00", "TITLE"], ["01", "PROLOGUE"], ["02", "ABOUT"], ["03", "SORROW"] ];
+    let textTimer; let charList = [];
 
-    function stopWalking() {
-        isWalking = false;
-        cancelAnimationFrame(walkAnimId);
-    }
-
-    // =========================================================
-    // PART 4: 外部操作用
-    // =========================================================
-    window.updateHeader = function(num, text) {
-        const numEl = document.getElementById('ui-number');
-        const labelEl = document.getElementById('ui-label');
-        if(numEl) numEl.textContent = num;
-        if(labelEl) labelEl.textContent = text;
+    window.updateHeader = function(num, txt) {
+        const nEl = document.getElementById('ui-number'), lEl = document.getElementById('ui-label');
+        let s = 0; const t = setInterval(() => {
+            if (s++ < 20) {
+                nEl.textContent = chars[Math.floor(Math.random()*chars.length)] + chars[Math.floor(Math.random()*chars.length)];
+                lEl.textContent = Array(txt.length).fill().map(()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+            } else { clearInterval(t); nEl.textContent = num; lEl.textContent = txt; }
+        }, 30);
     };
+
+    function changePage(next) {
+        if (next < 0 || next >= totalPages || next === currentPage) return;
+        if (textTimer) clearInterval(textTimer);
+        groups[currentPage].style.opacity = '0';
+        setTimeout(() => {
+            groups[currentPage].style.display = 'none'; groups[currentPage].classList.remove('is-active');
+            groups[next].style.display = 'flex';
+            window.updateHeader(pageData[next][0], pageData[next][1]);
+            if (next >= 1) prepareText(next);
+            setTimeout(() => {
+                groups[next].style.opacity = '1'; groups[next].classList.add('is-active');
+                if (next >= 1) startText();
+            }, 50);
+            currentPage = next;
+        }, 500);
+    }
+
+    function prepareText(idx) {
+        const rootId = ['','prologue-text-root','about-text-root','sorrow-text-root'][idx];
+        const root = document.getElementById(rootId);
+        const ps = root.querySelectorAll('.p-text'); charList = [];
+        ps.forEach(p => {
+            if (p.classList.contains('split-done')) {
+                p.querySelectorAll('span').forEach(s => { s.classList.remove('char-lit'); charList.push(s); });
+                return;
+            }
+            const nodes = Array.from(p.childNodes); p.innerHTML = '';
+            nodes.forEach(node => {
+                if (node.nodeType === 3) {
+                    node.textContent.split('').forEach(c => { const s = document.createElement('span'); s.textContent = c; p.appendChild(s); charList.push(s); });
+                } else if (node.nodeName === 'BR') { p.appendChild(document.createElement('br')); }
+                else if (node.nodeType === 1) {
+                    const m = document.createElement('span'); m.className = node.className; p.appendChild(m);
+                    Array.from(node.childNodes).forEach(inN => {
+                        if (inN.nodeType === 3) { inN.textContent.split('').forEach(c => { const s = document.createElement('span'); s.textContent = c; m.appendChild(s); charList.push(s); }); }
+                        else if (inN.nodeName === 'BR') { m.appendChild(document.createElement('br')); }
+                    });
+                }
+            });
+            p.classList.add('split-done');
+        });
+    }
+
+    function startText() {
+        let i = 0; textTimer = setInterval(() => { if (i < charList.length) charList[i++].classList.add('char-lit'); else clearInterval(textTimer); }, 60);
+    }
+
+    document.getElementById('nav-right').addEventListener('click', () => changePage(currentPage + 1));
+    document.getElementById('nav-left').addEventListener('click', () => changePage(currentPage - 1));
+    document.querySelectorAll('.scroll-container').forEach(c => {
+        c.addEventListener('click', (e) => {
+            if (window.getSelection().toString().length > 0) return;
+            if (e.clientX < window.innerWidth / 2) changePage(currentPage - 1);
+            else changePage(currentPage + 1);
+        });
+    });
 });
