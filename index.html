@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YORU NO SANPO</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=final_fix_v5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;800&display=swap" rel="stylesheet">
@@ -14,10 +14,6 @@
     <div id="enter-page">
         <div id="noise-grid"></div>
         <div id="enter-trigger"></div>
-    </div>
-
-    <div id="loader-screen">
-        <canvas id="moonCanvas" width="300" height="300"></canvas>
     </div>
 
     <main id="main-content">
@@ -35,6 +31,8 @@
         </div>
 
         <div class="center-group" id="group-prologue" style="display: none; opacity: 0;">
+            <div class="prologue-bg-container">
+        <img src="prologue_bg.jpg" alt="" class="prologue-bg-image"></div>
             <div class="scroll-container">
                 <div class="prologue-inner" id="prologue-text-root">
                     <p class="p-text">夜。</p>
@@ -44,8 +42,8 @@
                     <div class="spacer-s"></div>
                     <p class="p-text">何もかもが、<br>陽の照る時間とは違った姿を呈する。</p>
                     <div class="spacer-m"></div>
-                    <p class="p-text">ある日の眠れない23時過ぎ、<br>私はなにを思ったか、まるで光に集り貪る蛾のように、<br>気の済むまで夜の街をゆらゆらと彷徨った。</p>
-                    <p class="p-text">日々胸に溜めこんだ、グズグズと煮えるざわめきを供養するように、<br>ひたすらシャッターを切った。</p>
+                    <p class="p-text">ある日の眠れない23時過ぎ、<br>私はなにを思ったか、<br>まるで光に集り貪る蛾のように、<br>気の済むまで夜の街をゆらゆらと彷徨った。</p>
+                    <p class="p-text">日々胸に溜めこんだ、<br>グズグズと煮えるざわめきを供養するように、<br>ひたすらシャッターを切った。</p>
                     <div class="spacer-m"></div>
                     <p class="p-text">闇夜に輝く光達には得も言われぬ美しさ、<br>ある種の神秘性が宿る。</p>
                     <p class="p-text">そしてその光を捉えることで、<br>私は私を癒すことができる。<br>そう信じている。</p>
@@ -54,58 +52,212 @@
                     <div class="spacer-l"></div>
                 </div>
             </div>
+            <div class="scroll-indicator-vertical" id="scroll-indicator-prologue">
+                <span class="scroll-text-v">scroll</span>
+                <svg class="scroll-arrow-svg" viewBox="0 0 10 50">
+                    <path class="arrow-path" d="M 5 0 V 40 L 9 32" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                    <path class="arrow-light" d="M 5 0 V 40 L 9 32" fill="none" stroke="#fff" stroke-width="1" />
+                </svg>
+            </div>
         </div>
 
         <div class="center-group" id="group-about" style="display: none; opacity: 0;">
             <div class="about-bg-container"><img src="about_bg.png" alt="" class="about-bg-image"></div>
             <div class="scroll-container about-scroll">
                 <div class="prologue-inner about-inner" id="about-text-root">
-                    <p class="p-text">溢れんばかりの人間と、<br>彼らが生み出すカオスな雰囲気が渦巻く夜の都会には、<br>「光」が溢れている。</p>
-                    <p class="p-text">渋谷のスクランブル交差点や<br>新宿の歌舞伎町周辺のエネルギッシュな空気を<br>象徴するような、目が眩むほどの輝かしい光もあれば、</p>
-                    <p class="p-text">その裏通りに隠れる、切れかけで明滅する蛍光灯や<br>淡く優しく道を照らす街路灯など<br>色々な種類が存在することに気づく。</p>
+                    <p class="p-text">
+                        溢れんばかりの人間と、彼らが生み出す<br>
+                        <span class="ib">カオス</span>な雰囲気が渦巻く夜の<span class="ib">都会</span>には、<br>
+                        「光」が溢れている。
+                    </p>
+                    <p class="p-text">
+                        渋谷のスクランブル交差点や新宿<br>
+                        <span class="ib">歌舞伎町</span>周辺のエネルギッシュな空気を<br>
+                        象徴するような、目が眩むほどの<br>
+                        <span class="ib">輝かしい光</span>もあれば、
+                    </p>
+                    <p class="p-text">
+                        その裏通りに隠れる、切れかけで<span class="ib">明滅する</span><br>
+                        蛍光灯や、淡く優しく道を照らす街路灯<br>
+                        など色々な種類が存在することに<span class="ib">気付く。</span>
+                    </p>
                     <div class="spacer-m"></div>
-                    <p class="p-text">本サイトの目的は<br>「<span class="mark-white">光が織りなす夜の街の美しさの<br>再探索・再発見および、それらを<br>“感情”とリンクさせ分類する</span>」ことにある。</p>
-                    <p class="p-text">人には多くの感情が複雑に抱え込まれており、<br>それらが呼び起こされるファクターとして<br>周囲の環境が大きく作用している。</p>
-                    <p class="p-text">それに深く関わっているものの一つが「照明」だ。</p>
+                    <p class="p-text">
+                        本サイトの目的は、<br>
+                        「<span class="mark-white">光が織りなす夜の街の美しさの再発見<br>
+                        及び、それらを“感情”とリンクさせ<br>
+                        分類する</span>」ことにある。
+                    </p>
+                    <p class="p-text">
+                        人には多くの感情が抱え込まれており、<br>
+                        それらが呼び起こされる<span class="ib">ファクター</span><br>
+                        として、周囲の環境が大きく<span class="ib">作用している。</span>
+                    </p>
+                    <p class="p-text">
+                        それに深く関わっているものの一つが<br>
+                        <span class="ib">「照明」だ。</span>
+                    </p>
                     <div class="spacer-l"></div>
-                    <p class="p-text">私は光が煽る主な感情を、四つに分類した。</p>
-                    <p class="p-text">それが<br>「<span class="mark-blue">寂寥</span>」、「<span class="mark-orange">温包</span>」、<br>「<span class="mark-yellowgreen">輝興</span>」、「<span class="mark-poison">慄然</span>」だ。</p>
+                    <p class="p-text">
+                        私は光が煽る主な感情を、<br>
+                        <span class="ib">四つに分類した。</span>
+                    </p>
+                    <p class="p-text">
+                        それが<br>
+                        「<span class="mark-blue">寂寥</span>」「<span class="mark-orange">温包</span>」「<span class="mark-yellowgreen">輝興</span>」「<span class="mark-poison">慄然</span>」だ。
+                    </p>
                     <div class="spacer-l"></div>
-                    <p class="p-text">さあ、散歩へでかけましょう。</p>
+                    <p class="p-text">さあ、散歩へ出かけよう。</p>
                     <div class="spacer-l"></div>
+                </div>
+            </div>
+            <div class="scroll-indicator-vertical" id="scroll-indicator-about">
+                <span class="scroll-text-v">scroll</span>
+                <svg class="scroll-arrow-svg" viewBox="0 0 10 50">
+                    <path class="arrow-path" d="M 5 0 V 40 L 9 32" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                    <path class="arrow-light" d="M 5 0 V 40 L 9 32" fill="none" stroke="#fff" stroke-width="1" />
+                </svg>
+            </div>
+        </div>
+        
+        <div class="center-group" id="group-sorrow" style="display: none; opacity: 0;">
+            <div class="sorrow-container">
+                <div class="sorrow-logo-area"><img src="sekiryo_logo.png" alt="寂寥" class="sekiryo-logo-img"></div>
+                <div class="sorrow-text-area" id="sorrow-text-root">
+                    <svg class="sorrow-border-svg"><rect class="sorrow-border-rect" /></svg>
+                    <div class="sorrow-text-content">
+                        <p class="p-text">ぽつりと光る、冷たい明り。<br><br>感傷にふける宵は<br>仄かに青く深まる。<br><br>瞼は重く、意識は嫌に冴える。<br><br>残り少ない水を一気に呷った。</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="center-group" id="group-sorrow" style="display: none; opacity: 0;">
-            <div class="about-bg-container"><img src="sekiryo_bg.png" alt="" class="about-bg-image"></div>
-            <div class="scroll-container sorrow-scroll">
-                <div class="prologue-inner about-inner" id="sorrow-text-root">
-                    
-                    <div class="logo-animation-container">
-                        <img src="sekiryo_logo.png" alt="寂寥" class="sekiryo-logo-img">
-                        <div class="tear t1"></div>
-                        <div class="tear t2"></div>
-                        <div class="tear t3"></div>
-                    </div>
+        <div class="center-group" id="group-gallery" style="display: none; opacity: 0;">
+            <div class="gallery-safe-area" id="js-gallery-canvas">
+                <div class="g-item-wrapper"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo01.jpg" alt="Photo 1" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo02.jpg" alt="Photo 2" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo03.jpg" alt="Photo 3" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo04.jpg" alt="Photo 4" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo05.jpg" alt="Photo 5" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+            </div>
+        </div>
 
-                    <div class="spacer-m"></div>
-                    <p class="p-text">ぽつりと光る、冷たい明り。</p>
-                    <p class="p-text">感傷にふける宵は<br>仄かに青く深まる。</p>
-                    <p class="p-text">瞼は重く、意識は嫌に冴える。</p>
-                    <div class="spacer-m"></div>
-                    <p class="p-text">残り少ない水を一気に呷った。</p>
-                    <div class="spacer-l"></div>
+        <div class="center-group" id="group-kikyou" style="display: none; opacity: 0;">
+            <div class="kikyou-container">
+                <div class="kikyou-logo-area"><img src="kikyo_logo.png" alt="輝興" class="kikyou-logo-img"></div>
+                <div class="kikyou-text-area" id="kikyou-text-root">
+                    <svg class="kikyou-border-svg"><rect class="kikyou-border-rect" /></svg>
+                    <div class="kikyou-text-content">
+                        <p class="p-text">目が眩むほどまばゆい、極彩色の輝き。<br><br>ネオンひしめく喧騒に虹色のエネルギーが<br>花火の如く爆ぜては爆ぜる。<br><br>いつとはなしに足取りは弾んでいた。<br><br>委ねましょう、この高鳴りに。</p>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-gallery-kikyou" style="display: none; opacity: 0;">
+            <div class="gallery-safe-area" id="js-gallery-canvas-kikyou">
+                <div class="g-item-wrapper g-kikyou"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo06.jpg" alt="Photo 6" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-kikyou"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo07.jpg" alt="Photo 7" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-kikyou"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo08.jpg" alt="Photo 8" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-kikyou"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo09.jpg" alt="Photo 9" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-ritsuzen" style="display: none; opacity: 0;">
+            <div class="ritsuzen-container">
+                <div class="ritsuzen-logo-area"><img src="ritsuzen_logo.png" alt="慄然" class="ritsuzen-logo-img"></div>
+                <div class="ritsuzen-text-area" id="ritsuzen-text-root">
+                    <svg class="ritsuzen-border-svg"><rect class="ritsuzen-border-rect" /></svg>
+                    <div class="ritsuzen-text-content">
+                        <p class="p-text">夢か現か、美しくも恐ろしい光り。<br><br>世界の裏側にでも迷い込んだのだろうか？<br><br>背筋に冷たい霜が伝う。<br>灰の雨雲が脳を埋め尽くす。<br><br>闇の先には一体何がある...<br><br>....後ろに誰かいる？</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-gallery-ritsuzen" style="display: none; opacity: 0;">
+            <div class="gallery-safe-area" id="js-gallery-canvas-ritsuzen">
+                <div class="g-item-wrapper g-ritsuzen"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo10.jpg" alt="Photo 10" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-ritsuzen"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo11.jpg" alt="Photo 11" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-ritsuzen"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo12.jpg" alt="Photo 12" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-ritsuzen"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo13.jpg" alt="Photo 13" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+            </div>
+        </div>
+        
+        <div class="center-group" id="group-warmth" style="display: none; opacity: 0;">
+            <div class="warmth-container">
+                <div class="warmth-logo-area"><img src="warmth_logo.png" alt="温包" class="warmth-logo-img"></div>
+                <div class="warmth-text-area" id="warmth-text-root">
+                    <svg class="warmth-border-svg"><rect class="warmth-border-rect" /></svg>
+                    <div class="warmth-text-content">
+                        <p class="p-text">柔らかい毛布で包むような、温かな灯り。<br><br>疲れを癒すように、心を慰めるように。<br><br>優しく撫ででください。<br>頬の震えを拭い取ってください。<br><br>私もそちら側へ、誘われてしまいたい。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-gallery-warmth" style="display: none; opacity: 0;">
+            <div class="gallery-safe-area" id="js-gallery-canvas-warmth">
+                <div class="g-item-wrapper g-warmth"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo14.jpg" alt="Photo 14" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-warmth"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo15.jpg" alt="Photo 15" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-warmth"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo16.jpg" alt="Photo 16" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-warmth"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo17.jpg" alt="Photo 17" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+                <div class="g-item-wrapper g-warmth"><svg class="g-border-svg"><rect class="g-border-rect" /></svg><img src="img/photo18.jpg" alt="Photo 18" class="g-item-img" onclick="event.stopPropagation(); openModal(this);"></div>
+            </div>
+        </div>
+
+        <div class="center-group" id="group-sunrise" style="display: none; opacity: 0;">
+            <div class="sunrise-bg-container">
+                <img src="sunrise_bg.jpg" alt="Sunrise" class="sunrise-bg-image">
+            </div>
+            <div class="sunrise-text-container">
+                <div class="sunrise-text-wrapper" id="sunrise-text-root">
+                    <p class="p-text text-sunrise">もう帰ろう。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="center-group scroll-y" id="group-home" style="display: none; opacity: 0;">
+            <div class="home-header">
+                <img src="center_title.png" alt="YORU NO SANPO" class="home-logo-img">
+                <canvas id="homeWalkCanvas" width="200" height="200"></canvas>
+                <p class="tap-guide home-guide-text">ARCHIVE</p>
+                <div class="scroll-indicator-vertical" id="scroll-indicator-home">
+                    <span class="scroll-text-v">scroll</span>
+                    <svg class="scroll-arrow-svg" viewBox="0 0 10 50">
+                        <path class="arrow-path" d="M 5 0 V 40 L 9 32" fill="none" stroke="#000" stroke-width="1" />
+                        <path class="arrow-light arrow-light-black" d="M 5 0 V 40 L 9 32" fill="none" stroke="#000" stroke-width="1" />
+                    </svg>
+                </div>
+            </div>
+            <div class="home-gallery-container">
+                <div class="home-column" id="home-col-left"></div>
+                <div class="home-column" id="home-col-right"></div>
+            </div>
+            <div class="home-footer">
+                <div class="footer-btn" id="btn-re-enter">
+                    <img src="re-enter.png" alt="Re:ENTER" class="home-footer-img">
+               </div>
+               <a href="https://x.com/RaspberryHermit" target="_blank" class="footer-btn">
+                  <img src="me.png" alt="CREDIT" class="home-footer-img">
+               </a>
+            </div>
+        </div>
+
+        <div id="gallery-modal" onclick="closeModal()">
+            <div class="modal-content">
+                <img id="modal-img" src="" alt="">
             </div>
         </div>
 
         <div class="ui-fixed ui-bottom-wrapper">
             <img src="ui_bottom.png" class="ui-bottom-image" alt="">
         </div>
+        
         <div id="nav-left" class="nav-zone"></div>
         <div id="nav-right" class="nav-zone"></div>
+
     </main>
-    <script src="script.js"></script>
+    <script src="script.js?v=final_fix_v5"></script>
 </body>
 </html>

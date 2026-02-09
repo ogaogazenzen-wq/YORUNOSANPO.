@@ -1,60 +1,556 @@
 /* =========================================
-   基本設定 & ENTER (然さんの完璧設定を復元)
+   YORU NO SANPO - 修正版 style.css
+   (貴方の提示コードをベースに機能不具合のみ修正)
    ========================================= */
-:root { --bg-color: #050505; --text-base: rgba(255, 255, 255, 1); --font-mono: 'Inter', sans-serif; }
-body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: var(--bg-color); color: var(--text-base); font-family: var(--font-mono); overflow: hidden; touch-action: none; }
+
+/* --- 1. 変数とリセット --- */
+:root { 
+    --bg-color: #050505; 
+    --text-base: rgba(255, 255, 255, 1); 
+    --font-mono: 'Inter', sans-serif; 
+    --sorrow-cyan: #00aeff;
+    --kikyou-green: #b7ff00; 
+    --ritsuzen-green: #008f5d; 
+    --warmth-orange: #ff4d00; 
+
+    --ui-top-h: 9vh;    
+    --ui-bottom-h: 9vh; 
+}
+
+html, body { 
+    margin: 0; padding: 0; 
+    width: 100%; height: 100%; 
+    background-color: var(--bg-color); color: var(--text-base); 
+    font-family: var(--font-mono); 
+    overflow: hidden; touch-action: none; 
+}
+
+/* 白背景モード */
+body.is-white-mode,
+body.is-white-mode #main-content {
+    background-color: #ffffff !important;
+    transition: background-color 0.5s ease;
+}
+
+/* 白背景時のUI色反転 */
+body.is-white-mode .ui-fixed,
+body.is-white-mode .nav-zone,
+body.is-white-mode .scroll-indicator-vertical {
+    mix-blend-mode: difference !important;
+    filter: none !important;
+    color: #fff !important; 
+    z-index: 500 !important; /* UIは最前面 */
+}
+body.is-white-mode #ui-label, 
+body.is-white-mode .ui-pos-00 {
+    background-color: transparent !important;
+}
+
+/* --- 2. 共通パーツ --- */
 
 #enter-page { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; z-index: 1000; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease; cursor: pointer; }
 #noise-grid { display: grid; width: auto; height: auto; margin: auto; user-select: none; justify-content: center; align-content: center; pointer-events: none; }
 .grid-item { display: flex; justify-content: center; align-items: center; color: rgba(255, 255, 255, 0.3); font-size: 12px; transition: color 0.1s; }
-@media screen and (max-width: 768px) { .grid-item { font-size: 10px; } }
 .is-enter { color: #fff; text-shadow: 0 0 5px #fff; font-weight: bold; z-index: 10; }
 
-/* --- 共通レイアウト --- */
-#loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 900; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-#main-content { position: relative; width: 100%; height: 100vh; height: 100dvh; background-color: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 1.5s ease; overflow: hidden; }
+#main-content { position: relative; width: 100%; height: 100dvh; background-color: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 1.5s ease; overflow: hidden; }
+#main-content::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E"); opacity: 0.05; pointer-events: none; z-index: 999; }
 
-.ui-top-container { position: absolute; top: 20px; left: 0; right: 0; width: 100%; height: auto; z-index: 10; pointer-events: none; }
+.ui-top-container { position: absolute; top: 20px; left: 0; right: 0; width: 100%; height: auto; z-index: 100; pointer-events: none; }
 .ui-top-image { width: 100%; display: block; height: auto; object-fit: cover; object-position: left top; }
 .ui-pos-00 { position: absolute; left: 11.5%; top: 69.9%; font-family: var(--font-mono); font-weight: 800; font-size: 2.8vw; line-height: 1; }
 .ui-pos-title { position: absolute; left: 20%; top: 26.3%; font-family: var(--font-mono); font-weight: 800; font-size: 4.1vw; line-height: 1; letter-spacing: 0.05em; }
 #ui-label { background-color: var(--bg-color); padding-left: 2px; padding-right: 5px; position: relative; z-index: 2; }
 
+.ui-bottom-wrapper { position: absolute; bottom: 20px; left: 0; width: 100%; height: auto; z-index: 100; overflow: hidden; clip-path: polygon(0 0, -10% 0, -30% 100%, 0 100%); }
+@keyframes stepRevealDiagonal { 0% { clip-path: polygon(0 0, -10% 0, -30% 100%, 0 100%); } 100% { clip-path: polygon(0 0, 130% 0, 100% 100%, 0 100%); } }
+.ui-bottom-wrapper.is-active { animation: stepRevealDiagonal 2.5s steps(38, end) forwards; }
+.ui-bottom-image { width: 100vw; height: auto; display: block; object-fit: cover; object-position: left; }
+
 .center-group { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; }
-.center-logo { width: 55vw; max-width: 290px; height: auto; }
+.center-logo { width: 55vw; max-width: 290px; height: auto; filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); }
 #walkCanvas { margin-top: -10px; width: 100px; height: 100px; }
 .tap-guide { margin-top: 20px; color: #666; font-size: 10px; letter-spacing: 0.2em; animation: blinkSoft 3s infinite; }
 
-.scroll-container { width: 100%; padding: 0 20px; box-sizing: border-box; max-height: 58vh; overflow-y: auto; overflow-x: hidden; touch-action: pan-y; position: relative; z-index: 60; scrollbar-width: none; }
-.p-text { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 13.5px; line-height: 2.1; letter-spacing: 0.12em; text-align: center; margin-bottom: 2.5vh; color: #444; transition: color 0.3s; word-break: keep-all; }
-.char-lit { color: #ffffff; text-shadow: 0 0 2px rgba(255, 255, 255, 0.5); }
+/* ★Nav: 200 */
+.nav-zone { position: fixed; top: 0; height: 100%; width: 50%; z-index: 200; cursor: pointer; }
+#nav-left { left: 0; } #nav-right { right: 0; }
 
-/* マーカー */
-span[class^="mark-"] { padding: 2px 2px; margin: 0 -2px; border-radius: 2px; transition: background-color 0.5s; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.mark-blue { background-color: rgba(0, 140, 255, 0.6); }
-.mark-orange { background-color: rgba(235, 60, 10, 0.9); }
-.mark-yellowgreen { background-color: rgba(190, 255, 0, 0.85); }
-.mark-yellowgreen .char-lit { color: #000 !important; text-shadow: none; }
-.mark-poison { background-color: rgba(0, 80, 20, 0.95); box-shadow: 0 0 8px rgba(0, 100, 30, 0.8); }
-.mark-poison .char-lit { color: #ffffff !important; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); }
-.mark-white { background-color: rgba(255, 255, 255, 0.85); }
-.mark-white .char-lit { color: #000 !important; text-shadow: none; }
+/* ★Scroll Container: Z-indexをNavより高い210に変更し、操作可能に */
+.scroll-container { 
+    width: 100%; padding: 0 20px; box-sizing: border-box; 
+    max-height: 58vh; overflow-y: auto; overflow-x: hidden; touch-action: pan-y; 
+    position: relative; 
+    z-index: 210; /* 修正: 60 -> 210 */
+    scrollbar-width: none;
+    pointer-events: auto !important; 
+}
+.spacer-s { height: 3vh; width: 100%; } .spacer-m { height: 6vh; width: 100%; } .spacer-l { height: 10vh; width: 100%; }
 
-/* ABOUT & SORROW 背景設定 */
-.about-bg-container { position: absolute; top: 0; right: 0; width: 67%; height: 100%; z-index: 0; transform: translateX(100%); transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+/* スクロール矢印 */
+.scroll-indicator-vertical { position: absolute !important; bottom: 110px; right: 25px; display: flex; flex-direction: column; align-items: center; z-index: 300; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; animation: bounceVertical 2.5s ease-in-out infinite; }
+@keyframes bounceVertical { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+.scroll-indicator-vertical.is-hidden { opacity: 0 !important; visibility: hidden !important; }
+.scroll-text-v { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); writing-mode: vertical-rl; text-orientation: mixed; margin-bottom: 6px; text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); line-height: 1; }
+.scroll-arrow-svg { width: 10px; height: 50px; overflow: visible; }
+.arrow-path { stroke-linecap: square; stroke-linejoin: miter; }
+.arrow-light { stroke-dasharray: 60; stroke-dashoffset: 60; stroke-linecap: square; stroke-linejoin: miter; filter: drop-shadow(0 0 2px #fff); animation: sharpFlow 2s cubic-bezier(0.77, 0, 0.175, 1) infinite; }
+.arrow-light-black { filter: none !important; stroke: #000 !important; }
+
+@keyframes sharpFlow { 0% { stroke-dashoffset: 60; opacity: 0; } 20% { opacity: 1; } 50% { stroke-dashoffset: 0; } 80% { stroke-dashoffset: -60; opacity: 0; } 100% { stroke-dashoffset: -60; opacity: 0; } }
+body.is-white-mode .scroll-text-v { color: #000000 !important; text-shadow: none !important; }
+
+.about-bg-container { position: absolute; top: 0; right: 0; width: 78%; height: 100%; z-index: 0; transform: translateX(100%); transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1); }
 .about-bg-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
 .is-active .about-bg-container { transform: translateX(0); }
-.about-scroll { margin-left: 0; margin-right: auto; width: 65%; margin-top: 15vh; }
-.about-inner { align-items: flex-start; }
-#group-about .p-text, #group-sorrow .p-text { text-align: left; color: #777; }
 
+/* ★ここから追加：PROLOGUEの写真設定★ */
+.prologue-bg-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* ABOUTと同じ幅設定にして統一感を出すよ */
+    width: 78%; 
+    height: 100%;
+    z-index: 0; /* 文章より奥に */
+    
+    /* 初期状態：画面の「上」に見切れて隠しておく */
+    transform: translateX(100%);
+    
+    /* ABOUTと同じ滑らかな動きの設定 */
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.prologue-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9; /* 少しだけ透けさせて雰囲気を出す */
+}
 
-/* --- UI BOTTOM 復元 --- */
-.ui-bottom-wrapper { position: absolute; bottom: 20px; left: 0; width: 0%; height: auto; transition: width 3.0s cubic-bezier(0.2, 1, 0.3, 1); z-index: 10; overflow: hidden; }
-.ui-bottom-wrapper.is-active { width: 100%; }
-.ui-bottom-image { width: 100vw; height: auto; display: block; object-fit: cover; object-position: left; }
+/* ページが表示されたら、「上」から定位置に降りてくる */
+.is-active .prologue-bg-container {
+    transform: translateX(0);
+}
+/* ★追加ここまで★ */
 
-.nav-zone { position: fixed; top: 0; height: 100%; width: 50%; z-index: 50; cursor: pointer; }
-#nav-left { left: 0; } #nav-right { right: 0; }
-.spacer-s { height: 3vh; width: 100%; } .spacer-m { height: 6vh; width: 100%; } .spacer-l { height: 10vh; width: 100%; }
-@media screen and (max-width: 500px) { .about-scroll { width: 90%; } .about-bg-container { width: 80%; } .sekiryo-logo-img { width: 150px; } }
+/* ★文字修正: word-break: normal を追加 */
+.p-text { 
+    font-family: 'Inter', sans-serif; font-weight: 500; 
+    font-size: 13.5px; line-height: 2.1; letter-spacing: 0.12em; 
+    text-align: center; margin-bottom: 2.5vh; 
+    color: rgba(255, 255, 255, 0.25); 
+    width: 100%; 
+    word-break: normal; /* 修正 */
+    overflow-wrap: break-word;
+    pointer-events: auto;
+}
+.p-text span { display: inline !important; }
+.char-lit { color: #ffffff; text-shadow: 0 0 2px rgba(255, 255, 255, 0.5); }
+span[class^="mark-"] { padding: 0; margin: 0; border-radius: 0; transition: background-color 0.5s; display: inline; color: inherit; }
+
+@media screen and (min-width: 769px) {
+    .p-text { text-align: justify; color: #444; }
+    .char-lit { color: #ffffff; text-shadow: none; }
+    .mark-blue { background-color: rgba(0, 140, 255, 0.6); }
+    .mark-orange { background-color: rgba(235, 60, 10, 0.9); }
+    .mark-yellowgreen { background-color: rgba(190, 255, 0, 0.85); }
+    .mark-poison { background-color: rgba(0, 80, 20, 0.95); }
+    .mark-white { background-color: rgba(255, 255, 255, 0.85); }
+    .about-scroll { width: 100%; height: 100%; padding-right: 10px; margin-top: 15vh; }
+    .about-inner { width: 65%; max-width: 600px; margin-left: 5vw; display: flex; flex-direction: column; align-items: flex-start; }
+}
+
+@media screen and (max-width: 768px) {
+    .grid-item { font-size: 10px; }
+    #group-about .about-scroll { width: 100% !important; padding-top: 0 !important; padding-left: 20px !important; padding-right: 60px !important; }
+    #group-about .about-inner { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; display: block !important; }
+    .p-text { text-align: left; line-height: 2.2; margin-bottom: 30px; letter-spacing: -0.03em !important; word-break: break-all !important; }
+    span[class^="mark-"] { background-color: transparent !important; font-weight: 800 !important; }
+    .mark-blue { color: #00d2ff !important; } .mark-orange { color: #ff9f43 !important; } .mark-yellowgreen { color: #c0ff00 !important; } .mark-poison { color: #00ffaa !important; } .mark-white { color: #ffffff !important; }
+    span[class^="mark-"] .char-lit { color: inherit !important; text-shadow: 0 0 10px currentColor, 0 0 15px currentColor !important; }
+
+    .sorrow-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .sorrow-logo-area { position: absolute; top: 13%; left: -8%; width: 87%; z-index: 5; transform: translateX(-120%); opacity: 0; transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.5s ease-out; }
+    .is-active .sorrow-logo-area { transform: translateX(0); opacity: 1; }
+    .sekiryo-logo-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 5px var(--sorrow-cyan)) drop-shadow(0 0 15px var(--sorrow-cyan)); animation: subtleFluorescent 0.1s steps(4, end) infinite; }
+    .sorrow-text-area { position: absolute; bottom: 90px; right: 30px; width: 55vw; padding: 0; border: none; background: none; }
+    .sorrow-border-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+    .sorrow-border-rect { width: 100%; height: 100%; fill: none; stroke: var(--sorrow-cyan); stroke-width: 1.5px; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2000; stroke-dashoffset: 2000; }
+    .is-active .sorrow-border-rect { animation: smoothDrawBorder 1.5s ease-out forwards; animation-delay: 0.3s; }
+    .sorrow-text-content { position: relative; z-index: 2; padding: 20px; width: 100%; height: 100%; box-sizing: border-box; }
+    .sorrow-text-area .p-text { font-size: 11px !important; line-height: 2.0; margin-bottom: 0; color: rgba(255, 255, 255, 0.7) !important; }
+    
+    @keyframes subtleFluorescent { 0% { opacity: 1; } 25% { opacity: 0.92; } 50% { opacity: 1; } 75% { opacity: 0.88; } 100% { opacity: 0.95; } }
+    @keyframes smoothDrawBorder { 0% { stroke-dashoffset: 2000; } 100% { stroke-dashoffset: 0; } }
+
+    .kikyou-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .kikyou-logo-area { position: absolute; bottom: 15%; right: -5%; width: 75%; z-index: 5; transform: translateY(100%); opacity: 0; transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.2s ease-out; will-change: transform, opacity, filter; }
+    .is-active .kikyou-logo-area { transform: translateY(0); opacity: 1; }
+    .kikyou-logo-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 5px var(--kikyou-green)) drop-shadow(0 0 20px var(--kikyou-green)); animation: neonGiraGira 1.2s infinite; animation-delay: 1.5s; }
+    .kikyou-text-area { position: absolute; top: 110px; left: 30px; width: 65vw; padding: 0; border: none; background: none; }
+    .kikyou-border-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+    .kikyou-border-rect { width: 100%; height: 100%; fill: none; stroke: var(--kikyou-green); stroke-width: 1.5px; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2000; stroke-dashoffset: 2000; }
+    .is-active .kikyou-border-rect { animation: smoothDrawBorder 1.5s ease-out forwards; animation-delay: 0.3s; }
+    .kikyou-text-content { position: relative; z-index: 2; padding: 20px; width: 100%; height: 100%; box-sizing: border-box; }
+    .kikyou-text-area .p-text { font-size: 11px !important; line-height: 2.0; margin-bottom: 0; color: rgba(255, 255, 255, 0.7) !important; text-align: left; }
+
+    @keyframes neonGiraGira {
+        0%   { filter: drop-shadow(0 0 5px var(--kikyou-green)) drop-shadow(0 0 15px var(--kikyou-green)) brightness(1.0); }
+        15%  { filter: drop-shadow(0 0 10px var(--kikyou-green)) drop-shadow(0 0 30px var(--kikyou-green)) brightness(2.0); } 
+        30%  { filter: drop-shadow(0 0 5px var(--kikyou-green)) drop-shadow(0 0 15px var(--kikyou-green)) brightness(0.8); }
+        45%  { filter: drop-shadow(0 0 10px var(--kikyou-green)) drop-shadow(0 0 25px var(--kikyou-green)) brightness(1.5); } 
+        60%  { filter: drop-shadow(0 0 5px var(--kikyou-green)) drop-shadow(0 0 10px var(--kikyou-green)) brightness(0.9); }
+        75%  { filter: drop-shadow(0 0 15px var(--kikyou-green)) drop-shadow(0 0 40px var(--kikyou-green)) brightness(3.5); } 
+        100% { filter: drop-shadow(0 0 5px var(--kikyou-green)) drop-shadow(0 0 15px var(--kikyou-green)) brightness(1.0); }
+    }
+
+    .ritsuzen-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .ritsuzen-logo-area { position: absolute; top: 8%; right: -9%; width: 85%; z-index: 5; transform: translateY(-50px) scale(1.05); opacity: 0; transition: transform 2.0s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.5s ease-out; }
+    .is-active .ritsuzen-logo-area { transform: translateY(0) scale(1.0); opacity: 1; }
+    .ritsuzen-logo-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 5px #003322) drop-shadow(0 0 15px #003322); animation: horrorPulse 1.5s ease-in-out infinite; animation-delay: 2.5s; }
+    .ritsuzen-text-area { position: absolute; bottom: 80px; left: 30px; width: 72vw; padding: 0; border: none; background: none; }
+    .ritsuzen-border-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+    .ritsuzen-border-rect { width: 100%; height: 100%; fill: none; stroke: #003322; stroke-width: 1.5px; stroke-dasharray: 2000; stroke-dashoffset: 2000; }
+    .is-active .ritsuzen-border-rect { animation: smoothDrawBorder 2.5s ease-in-out forwards; animation-delay: 0.8s; }
+    .ritsuzen-text-content { position: relative; z-index: 2; padding: 20px; width: 100%; height: 100%; box-sizing: border-box; }
+    .ritsuzen-text-area .p-text { font-size: 11px !important; line-height: 2.2; margin-bottom: 0; color: rgba(255, 255, 255, 0.5) !important; text-align: left; }
+
+    .warmth-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .warmth-logo-area { position: absolute; bottom: 12%; left: -5%; width: 80%; z-index: 5; transform: translateX(-100%); opacity: 0; transition: transform 2.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 2.5s ease-out; }
+    .is-active .warmth-logo-area { transform: translateX(0); opacity: 1; }
+    .warmth-logo-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 2px var(--warmth-orange)) brightness(1.0); will-change: filter; }
+    .warmth-logo-img.warmth-anim-on { animation: warmthGlow 4.0s ease-in-out infinite; }
+    .warmth-text-area { position: absolute; top: 100px; right: 30px; width: fit-content; max-width: 85vw; padding: 0; border: none; background: none; }
+    .warmth-border-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+    .warmth-border-rect { width: 100%; height: 100%; fill: none; stroke: var(--warmth-orange); stroke-width: 1.5px; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2000; stroke-dashoffset: 2000; }
+    .is-active .warmth-border-rect { animation: smoothDrawBorder 2.0s ease-out forwards; animation-delay: 0.5s; }
+    .warmth-text-content { position: relative; z-index: 2; padding: 25px; width: 100%; height: 100%; box-sizing: border-box; }
+    .warmth-text-area .p-text { font-size: 11px !important; line-height: 2.1; margin-bottom: 0; text-align: left; white-space: nowrap; }
+
+    .gallery-safe-area { position: absolute; top: calc(var(--ui-top-h) + 30px); bottom: calc(var(--ui-bottom-h) + 30px); left: 30px; right: 30px; overflow: hidden; }
+    
+    /* ★写真ラッパー: Z-indexを210に上げてNav(200)より手前に！ */
+    .g-item-wrapper { 
+        position: absolute; box-sizing: border-box; cursor: pointer; 
+        opacity: 0; 
+        z-index: 210; /* 修正: 100 -> 210 */
+        pointer-events: auto !important; 
+    }
+    .g-item-wrapper.is-loaded { opacity: 1; }
+    .g-item-wrapper:active { transform: scale(0.98); }
+
+    .g-kikyou .g-border-rect { stroke: var(--kikyou-green) !important; }
+    .g-ritsuzen .g-border-rect { stroke: var(--ritsuzen-green) !important; animation-duration: 4.0s !important; }
+    .g-warmth .g-border-rect { stroke: var(--warmth-orange) !important; }
+
+    .is-active .g-kikyou .g-item-img { animation: kirakiraAppear 1.2s ease-out forwards !important; filter: saturate(1.3) contrast(1.1); }
+    .is-active .g-ritsuzen .g-item-img { animation: ghostFadeIn 5.0s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; filter: sepia(0.2) hue-rotate(130deg) saturate(0.8) brightness(0.8); }
+    .is-active .g-warmth .g-item-img { animation: warmthAppear 3.0s ease-out forwards !important; animation-delay: 1.0s !important; opacity: 0; will-change: filter, opacity, transform; }
+
+    .g-ritsuzen:nth-child(1) .g-item-img { animation-delay: 2.5s; }
+    .g-ritsuzen:nth-child(2) .g-item-img { animation-delay: 4.5s; } 
+    .g-ritsuzen:nth-child(3) .g-item-img { animation-delay: 3.5s; } 
+    .g-ritsuzen:nth-child(4) .g-item-img { animation-delay: 6.0s; }
+    .g-warmth .g-item-img { animation-delay: 1.0s !important; }
+
+    .g-border-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; pointer-events: none; }
+    .g-border-rect { width: 100%; height: 100%; fill: none; stroke: rgba(0, 174, 255, 0.7); stroke-width: 0.5px; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2000; stroke-dashoffset: 2000; }
+    .is-active .g-border-rect { animation: smoothDrawBorder 3.0s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.2s; }
+    .g-item-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; }
+    .is-active .g-item-img { animation: fluorescentTurnOn 0.7s ease-out forwards; }
+    .g-item-wrapper:nth-child(1) .g-item-img { animation-delay: 1.50s; }
+    .g-item-wrapper:nth-child(2) .g-item-img { animation-delay: 1.55s; } 
+    .g-item-wrapper:nth-child(3) .g-item-img { animation-delay: 1.60s; } 
+    .g-item-wrapper:nth-child(4) .g-item-img { animation-delay: 1.65s; } 
+    .g-item-wrapper:nth-child(5) .g-item-img { animation-delay: 1.70s; } 
+
+    #gallery-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-color: rgba(5, 5, 5, 0.90); backdrop-filter: blur(8px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; cursor: zoom-out; }
+    #gallery-modal.is-open { opacity: 1; visibility: visible; }
+    .modal-content { width: 90%; height: 90%; display: flex; justify-content: center; align-items: center; }
+    .modal-content img { max-width: 100%; max-height: 100%; object-fit: contain; border: 0.5px solid rgba(0, 174, 255, 0.5); box-shadow: 0 0 50px rgba(0, 0, 0, 0.8); transform: scale(0.85); opacity: 0; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
+    #gallery-modal.is-open .modal-content img { transform: scale(1.0); opacity: 1; }
+
+    .g-item-wrapper::after { content: "+"; position: absolute; bottom: 5px; right: 8px; font-family: var(--font-mono); font-size: 15px; font-weight: 400; color: #ffffff; text-shadow: 0 0 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.5); z-index: 999; pointer-events: none; opacity: 0; }
+    .is-active .g-item-wrapper::after { animation: plusReveal 1.0s ease-out forwards; animation-delay: 2.0s; }
+    @keyframes plusReveal { 0% { opacity: 0; transform: translateY(5px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    #group-gallery.is-active ~ #gallery-modal .modal-content img { border-color: rgba(0, 174, 255, 0.7); }
+    #group-gallery-kikyou.is-active ~ #gallery-modal .modal-content img { border-color: rgba(183, 255, 0, 0.7); }
+    #group-gallery-ritsuzen.is-active ~ #gallery-modal .modal-content img { border-color: rgba(0, 143, 93, 0.7); }
+    #group-warmth.is-active ~ #gallery-modal .modal-content img { border-color: rgba(255, 77, 0, 0.7); }
+    #group-gallery-warmth.is-active ~ #gallery-modal .modal-content img { border-color: rgba(255, 77, 0, 0.7); }
+
+} /* ← スマホ用カッコ閉じ */
+
+/* --- キーフレーム定義 (省略なし) --- */
+@keyframes fluorescentTurnOn {
+    0%, 8%, 15%, 25%, 35% { opacity: 0; filter: brightness(0); }
+    4%, 12%, 20%, 30%     { opacity: 1; filter: brightness(3.0); }
+    45%                   { opacity: 0.2; filter: brightness(0.1); }
+    50%                   { opacity: 1; filter: brightness(2.0); }
+    60%                   { opacity: 0.4; }
+    70%                   { opacity: 1; filter: brightness(1.5); }
+    85%                   { opacity: 0.8; }
+    100%                  { opacity: 1; filter: brightness(1.0); }
+}
+@keyframes kirakiraAppear { 0% { opacity: 0; filter: brightness(3.5) blur(3px); } 20% { opacity: 0.9; filter: brightness(2.5) blur(1px); } 40% { opacity: 0.6; filter: brightness(0.8); } 60% { opacity: 0.9; filter: brightness(2.2); } 75% { opacity: 0.7; filter: brightness(0.9); } 85% { opacity: 0.9; filter: brightness(1.8); } 100% { opacity: 1; filter: brightness(1.0) blur(0); } }
+@keyframes horrorPulse { 0% { filter: drop-shadow(0 0 5px #003322) drop-shadow(0 0 10px #003322) brightness(0.6); } 20% { filter: drop-shadow(0 0 10px #00aa66) drop-shadow(0 0 25px #00aa66) brightness(1.2); } 30% { filter: drop-shadow(0 0 3px #003322) drop-shadow(0 0 8px #003322) brightness(0.6); } 40% { filter: drop-shadow(0 0 15px #00cc88) drop-shadow(0 0 35px #00cc88) brightness(1.5); } 60% { filter: drop-shadow(0 0 0px transparent) brightness(0.05); } 65% { filter: drop-shadow(0 0 0px transparent) brightness(0.05); } 80% { filter: drop-shadow(0 0 5px #003322) drop-shadow(0 0 10px #003322) brightness(0.6); } 100% { filter: drop-shadow(0 0 5px #003322) drop-shadow(0 0 10px #003322) brightness(0.6); } }
+@keyframes ghostFadeIn { 0% { opacity: 0; filter: blur(15px) brightness(0) grayscale(1); transform: scale(1.05); } 50% { opacity: 0.3; filter: blur(5px) brightness(0.3) grayscale(0.5); } 100% { opacity: 1; filter: blur(0) brightness(1) grayscale(0); transform: scale(1.0); } }
+@keyframes warmthGlow { 0%, 100% { filter: drop-shadow(0 0 2px var(--warmth-orange)) brightness(1.0); } 50% { filter: drop-shadow(0 0 50px var(--warmth-orange)) brightness(1.2) saturate(1.5); } }
+@keyframes warmthAppear { 0% { opacity: 0; filter: blur(30px) sepia(1) hue-rotate(-35deg) saturate(10.0) brightness(1.5); transform: scale(1.15); } 40% { opacity: 1; filter: blur(20px) sepia(1) hue-rotate(-35deg) saturate(5.0) brightness(1.1); } 100% { opacity: 1; filter: blur(0) sepia(0) hue-rotate(0deg) saturate(1.0) brightness(1.0); transform: scale(1.0); } }
+
+/* SUNRISE */
+#group-sunrise { background-color: #ffffff; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 8; transition: opacity 2.0s ease-in-out !important; }
+.sunrise-bg-container { 
+    position: absolute; top: 0; left: 0; 
+    width: 100%; height: 100%; /* ★画面全体！ */
+    z-index: 0; 
+    /* アニメーション設定は削除して、静止画として配置 */
+}
+.sunrise-bg-image { width: 100%; height: 100%; object-fit: cover; object-position: left center; }
+/* ★修正: テキスト位置を右半分に固定 */
+.sunrise-text-container { position: absolute; top: 0; right: 0; width: 50%; height: 100%; z-index: 1; background-color: transparent; display: flex; justify-content: center; align-items: center; }
+.sunrise-text-wrapper { position: relative; padding: 0; }
+.p-text.text-sunrise { 
+    margin: 0; font-weight: 500; text-align: center; 
+    /* ★初期状態は灰色で、最初から見えている状態にする */
+    color: #888888; 
+    opacity: 1; 
+}
+/* アニメーションを新しいものに差し替え */
+.is-active .p-text.text-sunrise { 
+    animation: textGlowWhite 3.0s ease-in-out forwards; /* 3秒かけてゆっくりと */
+    animation-delay: 2.5s; /* 写真が表示されてから少し待って開始 */
+}
+/* 新しいキーフレーム定義：灰色から白へ */
+@keyframes textGlowWhite { 
+    0% { color: #888888; } 
+    100% { color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.5); } 
+}
+
+/* =========================================
+   8. HOME (Archive) セクション - 完全修正版
+   ========================================= */
+
+#group-home {
+    background-color: #ffffff;
+    width: 100%; height: 100dvh; 
+    position: absolute; top: 0; left: 0;
+    
+    /* ★修正: 最前面に配置 & 初期は非表示 */
+    z-index: 300; 
+    display: none; 
+    
+    overflow-y: auto; 
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    
+    opacity: 0;
+    transition: opacity 1.0s ease;
+    
+    margin: 0; padding: 0;
+}
+
+/* --- 1. ロゴエリア（高さ100%確保・吸着） --- */
+.home-header {
+    width: 100%;
+    /* 画面いっぱいの高さ */
+    height: 100dvh; 
+    min-height: 100dvh;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    /* スクロール追従（パララックス効果） */
+    position: sticky;
+    top: 0;
+    z-index: 1; /* 写真より奥 */
+    
+    /* フェードアウト用 */
+    transition: opacity 0.1s linear;
+}
+
+/* 黒いロゴ */
+.home-logo-img {
+    width: 50vw; max-width: 300px; height: auto;
+    filter: invert(1); 
+    margin-bottom: 20px; 
+    
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 2.0s ease, transform 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 黒いピクトグラム */
+#homeWalkCanvas {
+    margin-top: -10px;
+    width: 100px; height: 100px;
+    
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 2.0s ease, transform 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 0.3s;
+}
+
+/* ガイドテキスト */
+.home-guide-text {
+    font-size: 10px !important; letter-spacing: 0.2em; color: #999;
+    text-align: center;
+    
+    opacity: 0; 
+    transition: opacity 2.0s ease; transition-delay: 0.5s;
+}
+
+/* HOMEが表示されたら中身を出すスイッチ */
+#group-home.is-active .home-logo-img,
+#group-home.is-active #homeWalkCanvas,
+#group-home.is-active .home-guide-text {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+/* --- 2. ギャラリーエリア（ロゴの下に続く） --- */
+.home-gallery-container {
+    width: 100%;
+    /* 左右の余白と下の余白 */
+    padding: 0 15px 100px 15px; 
+    box-sizing: border-box;
+    
+    display: flex;
+    justify-content: space-between; 
+    align-items: flex-start; 
+    
+    /* 背景色を白にして、ロゴの上に被さるようにする */
+    background-color: #ffffff;
+    
+    position: relative;
+    z-index: 10; /* ロゴより手前 */
+    
+    /* ロゴ画面の下からスタートさせるための余白調整 */
+    /* sticky設定があるので margin-top: 0 でOK */
+    margin-top: 0; 
+    min-height: 100vh; /* スクロール領域確保 */
+    
+    opacity: 0;
+    transition: opacity 1.0s ease;
+}
+
+#group-home.is-active .home-gallery-container {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 写真の列 */
+.home-column {
+    width: 48%; /* 画面の半分 */
+    display: flex; flex-direction: column; gap: 15px; 
+}
+
+/* 写真本体 */
+.home-img {
+    width: 100%; height: auto; display: block;
+    /* 操作できない問題を解決：ポインターイベントを有効化 */
+    pointer-events: auto; 
+    cursor: zoom-in;
+    background-color: #f0f0f0; 
+}
+
+/* --- 3. フッター --- */
+.home-footer {
+    width: 100%; padding-bottom: 80px; 
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    background-color: #ffffff;
+    position: relative;
+    z-index: 20;
+}
+.footer-btn { 
+    font-size: 12px; letter-spacing: 0.2em; color: #000; 
+    border: 1px solid #000; padding: 10px 30px; 
+    cursor: pointer; background: #fff;
+    pointer-events: auto; 
+}
+
+/* HOME用のスクロール矢印調整 */
+#scroll-indicator-home {
+    bottom: 40px !important; 
+    z-index: 5 !important;
+}
+
+/* 写真背景があるページ用の設定（末尾に追加でOK） */
+body.is-photo-page .ui-fixed, 
+body.is-photo-page .scroll-indicator-vertical {
+    mix-blend-mode: difference !important;
+    color: #fff !important;
+}
+
+/* 黒い背景を透明にする */
+body.is-photo-page #ui-label, 
+body.is-photo-page .ui-pos-00 {
+    background-color: transparent !important;
+}
+
+/* --- ① プラスマーク：他の部屋と同じ繊細なデザインに --- */
+.home-img-wrapper {
+    position: relative;
+    width: 100%;
+}
+.home-img-wrapper::after {
+    content: "+";
+    position: absolute;
+    bottom: 5px; right: 8px; /* 位置も他の部屋に合わせたよ */
+    font-family: var(--font-mono);
+    font-size: 15px; /* 標準サイズ */
+    font-weight: 400; /* ★太字解除：細く繊細に */
+    color: #ffffff;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    opacity: 0.7;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* --- ボタンを縦並びに変更 & 強制的に巨大化 --- */
+.home-footer {
+    display: flex !important;
+    flex-direction: column !important; /* 縦並び */
+    justify-content: center;
+    align-items: center;
+    gap: 50px; /* ボタン間の間隔 */
+    padding: 10px 0 120px 0; /* 下部の余白 */
+}
+
+.home-footer-img {
+    /* ★ここが重要！ !important をつけて強制的にこの高さにする */
+    height: 50px !important; /* さらに少し大きくしてみたよ */
+    width: auto !important;   /* 幅は高さに合わせて自動調整 */
+    max-width: none !important; /* 親要素の幅制限を無視 */
+    
+    display: block;
+    transition: transform 0.2s ease;
+    /* 画像がぼやけないようにするおまじない（気休め程度だけど） */
+    image-rendering: -webkit-optimize-contrast; 
+}
+
+/* リンクエリアの設定 */
+.footer-btn {
+    display: block;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    cursor: pointer;
+    text-decoration: none;
+    /* リンクエリア自体も画像に合わせて大きくなるように */
+    width: auto; 
+    height: auto;
+}
+
+.footer-btn:active .home-footer-img {
+    transform: scale(1.0);
+}
+
+/* ★修正：HOME画面にいる時は、モーダルの画像の枠線と影を絶対に消す */
+#group-home.is-active ~ #gallery-modal .modal-content img {
+    border: none !important;
+    box-shadow: none !important;
+    /* 他のページの指定が残っていた場合の念の為の打ち消し */
+    border-color: transparent !important; 
+}
